@@ -34,36 +34,36 @@ function verifySignature(rawBody: string, signature: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    // IP validation
+    // Get raw body first to parse webhook data
+    const rawBody = await request.text()
+    const webhookData = JSON.parse(rawBody)
+    const { type, id, subject } = webhookData
+
+    console.log(`Received webhook: ${type}`, { id, timestamp: new Date().toISOString() })
+
+    // Handle validation webhook FIRST (before IP and signature checks)
+    if (type === 'validation.webhook') {
+      console.log(`Validation webhook received with ID: ${id}`)
+      return NextResponse.json({ id })
+    }
+
+    // Only perform security checks for non-validation webhooks
     const clientIP = getRealIP(request)
     if (!ALLOWED_IPS.includes(clientIP)) {
       console.warn(`Webhook rejected: Invalid IP ${clientIP}`)
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // Get raw body and signature
-    const rawBody = await request.text()
+    // Get signature for non-validation webhooks
     const signature = request.headers.get('x-signature')
-
     if (!signature) {
       return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
     }
 
-    // Verify signature
+    // Verify signature for non-validation webhooks
     if (!verifySignature(rawBody, signature)) {
       console.warn('Webhook rejected: Invalid signature')
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
-    }
-
-    // Parse webhook data
-    const webhookData = JSON.parse(rawBody)
-    const { type, id, subject } = webhookData
-
-    console.log(`Received webhook: ${type}`, { id, timestamp: new Date().toISOString() })
-
-    // Handle validation webhook
-    if (type === 'validation.webhook') {
-      return NextResponse.json({ id })
     }
 
     // Handle different webhook types
