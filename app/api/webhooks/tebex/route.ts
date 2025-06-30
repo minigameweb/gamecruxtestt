@@ -121,14 +121,15 @@ async function handlePaymentCompleted(subject: any) {
       .limit(1)
 
     if (existingSubscription.length > 0) {
-      // Update existing subscription
+      // Update existing subscription with full schema support
       await db
         .update(subscriptions)
         .set({
           isActive: "true",
           status: 'active',
           updatedAt: new Date(),
-          recurringPayment: recurring_payment_reference || existingSubscription[0].recurringPayment
+          recurringPayment: recurring_payment_reference || existingSubscription[0].recurringPayment,
+          failedPaymentCount: "0" // Reset failed payment count on successful payment
         })
         .where(eq(subscriptions.userId, custom.userid))
     } else {
@@ -159,7 +160,8 @@ async function handleRecurringPaymentRenewed(subject: any) {
         status: 'active',
         nextPaymentDate,
         updatedAt: new Date(),
-        failedPaymentCount: "0" // Reset failed payment count on successful renewal
+        failedPaymentCount: "0", // Reset failed payment count on successful renewal
+        pendingCancellation: "false" // Clear any pending cancellation
       })
       .where(eq(subscriptions.userId, last_payment.custom.userid))
 
