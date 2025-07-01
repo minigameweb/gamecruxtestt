@@ -36,7 +36,7 @@ export default function GameCruxLandingPage() {
                 <Link href="https://checkout.tebex.io/privacy" className="text-gray-300 hover:text-white transition-colors">
                   Privacy Policy
                 </Link>
-                <Link href="https://checkout.tebex.io/baskets/cetuwz-9914bbae2af32e3cf1fdad76d25f1ee5643a13d1/refund-policy" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/pages/refund" className="text-gray-300 hover:text-white transition-colors">
                   Refund Policy
                 </Link>
                 <Link href="/pages/contact" className="text-gray-300 hover:text-white transition-colors">
