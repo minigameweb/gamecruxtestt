@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Discord from "next-auth/providers/discord";
 
+omii
 export default {
   providers: [Credentials, Google, Discord],
   pages: {
